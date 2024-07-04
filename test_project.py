@@ -8,11 +8,13 @@ import os
 from excel_to_mysql import insert_data_from_excel
 from queries import get_current_year, create_table_for_year, check_and_create_table, contar_quantidade_total, contar_quantidade_diferentes, pessoas_por_tipo_de_cancer
 
-# Testar get_current_year
+#Este teste verifica se a função get_current_year retorna o ano atual. 
+#Ele compara o valor retornado pela função com o ano atual obtido pela função datetime.now().year.
 def test_get_current_year():
     assert get_current_year() == datetime.now().year
 
-# Mocking MySQL connection
+#Este fixture cria um mock para a conexão MySQL. 
+#Ele simula a conexão e o cursor do MySQL, permitindo que os testes que interagem com o banco de dados sejam executados sem um banco de dados real.
 @pytest.fixture
 def mock_mysql():
     mock_conn = Mock()
@@ -20,7 +22,8 @@ def mock_mysql():
     mock_conn.connection.cursor.return_value = mock_cursor
     return mock_conn
 
-# Testar insert_data_from_excel
+#Este teste verifica se a função insert_data_from_excel insere os dados corretamente no banco de dados. 
+#Ele cria um DataFrame mock e usa patch para simular a leitura de um arquivo Excel. Após chamar a função, ele verifica se os métodos "execute" e "commit" do cursor do MySQL foram chamados.
 def test_insert_data_from_excel(mock_mysql):
     # Criar um DataFrame mock
     data = {
@@ -48,13 +51,15 @@ def test_insert_data_from_excel(mock_mysql):
     assert mock_mysql.connection.cursor().execute.called
     assert mock_mysql.connection.commit.called
 
-# Testar create_table_for_year
+#Este teste verifica se a função create_table_for_year cria a tabela para o ano especificado. 
+#Ele verifica se os métodos execute e commit do cursor do MySQL foram chamados.
 def test_create_table_for_year(mock_mysql):
     create_table_for_year(mock_mysql, 2024)
     assert mock_mysql.connection.cursor().execute.called
     assert mock_mysql.connection.commit.called
 
-# Testar check_and_create_table
+#Este teste verifica se a função check_and_create_table cria a tabela para o ano atual. 
+#Ele usa patch para simular o ano atual e verifica se a tabela foi criada, confirmando que os métodos execute e commit do cursor do MySQL foram chamados.
 def test_check_and_create_table(mock_mysql):
     with patch('queries.get_current_year', return_value=2024):
         year = check_and_create_table(mock_mysql)
@@ -62,7 +67,8 @@ def test_check_and_create_table(mock_mysql):
     assert mock_mysql.connection.cursor().execute.called
     assert mock_mysql.connection.commit.called
 
-# Testar contar_quantidade_total
+#Este teste verifica se a função contar_quantidade_total retorna o total correto de registros para uma coluna específica. 
+#Ele simula o valor de retorno do método fetchone do cursor do MySQL e verifica se o total retornado pela função está correto.
 def test_contar_quantidade_total(mock_mysql):
     mock_mysql.connection.cursor().fetchone.return_value = [10]
     total = contar_quantidade_total(mock_mysql, 'Nome')
@@ -70,7 +76,8 @@ def test_contar_quantidade_total(mock_mysql):
     assert mock_mysql.connection.cursor().execute.called
     assert mock_mysql.connection.cursor().fetchone.called
 
-# Testar contar_quantidade_diferentes
+#Este teste verifica se a função contar_quantidade_diferentes retorna as contagens corretas para cada tipo de câncer. 
+#Ele simula o valor de retorno do método fetchall do cursor do MySQL e verifica se os tipos de câncer e as contagens retornadas estão corretos.
 def test_contar_quantidade_diferentes(mock_mysql):
     mock_mysql.connection.cursor().fetchall.return_value = [('Tipo1', 5), ('Tipo2', 3)]
     tipos_cancer, contagens = contar_quantidade_diferentes(mock_mysql, 'Tipo_Cancer')
@@ -79,7 +86,8 @@ def test_contar_quantidade_diferentes(mock_mysql):
     assert mock_mysql.connection.cursor().execute.called
     assert mock_mysql.connection.cursor().fetchall.called
 
-# Testar pessoas_por_tipo_de_cancer
+#Este teste verifica se a função pessoas_por_tipo_de_cancer retorna o tipo de câncer com a maior quantidade de pessoas. 
+#Ele simula o valor de retorno do método fetchone do cursor do MySQL e verifica se o tipo de câncer e a contagem retornada estão corretos.
 def test_pessoas_por_tipo_de_cancer(mock_mysql):
     mock_mysql.connection.cursor().fetchone.return_value = ('Tipo1', 5)
     resultado = pessoas_por_tipo_de_cancer(mock_mysql)
@@ -87,7 +95,8 @@ def test_pessoas_por_tipo_de_cancer(mock_mysql):
     assert mock_mysql.connection.cursor().execute.called
     assert mock_mysql.connection.cursor().fetchone.called
 
-# Testar tratamento de exceção em insert_data_from_excel
+#Este teste verifica se a função insert_data_from_excel trata exceções corretamente durante a inserção de dados no banco de dados. 
+#Ele simula uma exceção no método execute do cursor do MySQL e verifica se a mensagem de erro correta é impressa.
 def test_insert_data_from_excel_with_exception(mock_mysql, capsys):
     data = {
         'Nome': ['Teste Nome'],
