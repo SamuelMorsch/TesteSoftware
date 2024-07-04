@@ -44,5 +44,6 @@ def insert_data_from_excel(mysql, excel_file_path):
     mysql.connection.commit()
     cursor.close()
 
+
 # Exemplo de uso:
 # insert_data_from_excel(mysql_connection_object, '/mnt/data/Planilha estudantes.xlsx')
