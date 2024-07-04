@@ -33,11 +33,13 @@ body {
 }
 
 .meio {
-    font-size: 1.5rem;
     width: 30vh;
     height: 50vh;
     background-color: white;
-    color: black;
+}
+
+.img {
+    margin-top: 70px;
 }
 
 .baixo {
